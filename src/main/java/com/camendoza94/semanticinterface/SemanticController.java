@@ -1,7 +1,10 @@
 package com.camendoza94.semanticinterface;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.RDFNode;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -10,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -17,22 +21,57 @@ import java.util.List;
 class SemanticController {
 
     @RequestMapping(method = RequestMethod.POST)
-    void requestService(@RequestBody DeviceObservation observation) {
+    ResponseEntity<String> requestService(@RequestBody DeviceObservation observation) {
         String deviceID = observation.getDeviceId();
         List<AbstractMap.SimpleEntry<RDFNode, RDFNode>> matches = queryMatching();
-        getMatchLabel(matches.get(0).getKey().toString(), deviceID); //TODO revisar
-
-        //TODO find service with given property
-        //TODO make POST request to API URL of service with body on observation
+        System.out.println("Device ID: " + deviceID);
+        String label = getMatchLabel(matches.get(0).getKey().toString(), deviceID);
+        if (StringUtils.isEmpty(label)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Device not found");
+        }
+        System.out.println("Label: " + label);
+        String[] service = getServiceAPI(label, matches.get(0).getValue().toString());
+        System.out.println("Service: " + Arrays.toString(service));
+        if (service[0] == null || service[1] == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Service not found");
+        }
         Measurement measurement = new Measurement();
         measurement.setTimestamp(observation.getTimestamp());
         measurement.setValue(observation.getValue());
         RestTemplate template = new RestTemplate();
-        //template.postForEntity("http://localhost:8080/measurements", observation, String.class);
+        String URL = "http://" + service[0] + "/" + service[1];
+        System.out.println(URL);
+        return template.postForEntity(URL, observation, String.class);
+    }
+
+    private static String[] getServiceAPI(String label, String matched) {
+        String[] info = new String[2];
+        String qs = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
+                "PREFIX : <http://www.semanticweb.org/ca.mendoza968/ontologies/services#>\n" +
+                "SELECT ?URI ?methodValue\n" +
+                "WHERE {\n" +
+                " ?service a :Service; (:|!:)* ?property .\n" +
+                " ?property a <" + matched + ">; rdfs:label '" + label + "'.\n" +
+                " ?service :hasAPIURL ?URL; :hasMethod ?method .\n" +
+                " ?URL :hasStringValue ?URI.\n" +
+                " ?method a :Create; :hasStringValue ?methodValue .\n" +
+                "}";
+        QueryExecution exec = QueryExecutionFactory.sparqlService("http://localhost:3030/virtual/query", QueryFactory.create(qs));
+
+        ResultSet results = exec.execSelect();
+
+        if (results.hasNext()) {
+            QuerySolution next = results.next();
+            info[0] = next.get("URI").asLiteral().getString();
+            info[1] = next.get("methodValue").asLiteral().getString();
+        }
+        return info;
     }
 
     private static String getMatchLabel(String matched, String deviceId) {
-        String qs = "PREFIX : <http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#>\n" +
+        System.out.println("Matched Class: " + matched);
+        String qs = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
+                "PREFIX : <http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#>\n" +
                 "SELECT ?label\n" +
                 "WHERE {\n" +
                 " ?device a :Sensor; :hasDeviceId '" + deviceId + "'; (:|!:)* ?property .\n" +
@@ -44,7 +83,7 @@ class SemanticController {
 
         if (results.hasNext()) {
             QuerySolution next = results.next();
-            return next.get("label").asLiteral().getString();
+            return next.get("label").toString();
         }
         return "";
     }
@@ -63,7 +102,7 @@ class SemanticController {
 
         while (results.hasNext()) {
             QuerySolution next = results.next();
-            matches.add(new AbstractMap.SimpleEntry<>(next.get("entity1"), next.get("entity2")));
+            matches.add(new AbstractMap.SimpleEntry<>(next.get("entity2"), next.get("entity1")));
         }
 
         return matches;
