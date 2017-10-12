@@ -25,6 +25,8 @@
  */
 
 // Alignment API classes
+package com.camendoza94.semanticinterface;
+
 import fr.inrialpes.exmo.align.impl.BasicParameters;
 import fr.inrialpes.exmo.align.impl.method.StringDistAlignment;
 import fr.inrialpes.exmo.align.impl.renderer.RDFRendererVisitor;
@@ -51,7 +53,7 @@ import java.util.Properties;
 public class Skeleton {
 
     public static void main( String[] args ) {
-        URI onto1 = null;
+        URI onto1 = null; //TODO Connect to Fuseki and get both ontologies
         URI onto2 = null;
         Properties params = new BasicParameters();
 
@@ -75,7 +77,7 @@ public class Skeleton {
                     new BufferedWriter(
                             new OutputStreamWriter( System.out, StandardCharsets.UTF_8.name() )), true);
             AlignmentVisitor renderer = new RDFRendererVisitor(writer);
-            a1.render(renderer);
+            a1.render(renderer); //TODO Upload it to Fuseki
             writer.flush();
             writer.close();
 
