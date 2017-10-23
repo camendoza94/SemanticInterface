@@ -26,9 +26,10 @@ class SemanticController {
     ResponseEntity<String> requestService(@RequestBody DeviceObservation observation) {
         String deviceID = observation.getDeviceId();
         String URL;
+        ArrayList<String> serviceFields;
+        ArrayList<String> serviceTypes;
         JsonParser parser = new JsonParser();
         JsonObject body = parser.parse(observation.getPayload()).getAsJsonObject();
-        ArrayList<String> serviceFields;
         if (cache.get(deviceID) == null) {
             List<AbstractMap.SimpleEntry<RDFNode, RDFNode>> matches = queryMatching();
             System.out.println("Device ID: " + deviceID);
@@ -45,18 +46,23 @@ class SemanticController {
             URL = "http://" + service[0] + "/" + service[1];
             String[] fields = service[2].split(" ");
             String[] fieldTypes = service[3].split(" ");
-            //TODO use fieldTypes
             serviceFields = new ArrayList<>(Arrays.asList(fields));
-            cache.put(deviceID, new Method(URL, serviceFields));
+            serviceTypes = new ArrayList<>(Arrays.asList(fieldTypes));
+            cache.put(deviceID, new Method(URL, serviceFields, serviceTypes));
         } else {
             URL = cache.get(deviceID).getURL();
             serviceFields = cache.get(deviceID).getFields();
+            serviceTypes = cache.get(deviceID).getTypes();
         }
         JsonObject requestJson = new JsonObject();
         //TODO what if there is no field matches?
-        for (String serviceField : serviceFields) {
+        for (int i = 0; i < serviceFields.size(); i++) {
+            String serviceField = serviceFields.get(i);
             try {
-                requestJson.addProperty(serviceField, body.get(serviceField).getAsNumber());
+                if (serviceTypes.get(i).equalsIgnoreCase("String"))
+                    requestJson.addProperty(serviceField, body.get(serviceField).getAsString());
+                else
+                    requestJson.addProperty(serviceField, body.get(serviceField).getAsNumber());
             } catch (NullPointerException e) {
                 System.out.println("Field " + serviceField + " not found. Skipping.");
             }
