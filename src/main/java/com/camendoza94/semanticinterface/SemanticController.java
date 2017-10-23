@@ -1,10 +1,11 @@
 package com.camendoza94.semanticinterface;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.RDFNode;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,15 +18,18 @@ import java.util.*;
 @RequestMapping("/interface")
 class SemanticController {
 
-    private HashMap<String, String> cache = new HashMap<>();
+    private final HashMap<String, Method> cache = new HashMap<>();
+
+    private final RestTemplate template = new RestTemplate();
 
     @RequestMapping(method = RequestMethod.POST)
     ResponseEntity<String> requestService(@RequestBody DeviceObservation observation) {
         String deviceID = observation.getDeviceId();
         String URL;
-        RestTemplate template = new RestTemplate();
-        System.out.println(cache.get(deviceID));
-        if(cache.get(deviceID) == null ) {
+        JsonParser parser = new JsonParser();
+        JsonObject body = parser.parse(observation.getPayload()).getAsJsonObject();
+        ArrayList<String> serviceFields;
+        if (cache.get(deviceID) == null) {
             List<AbstractMap.SimpleEntry<RDFNode, RDFNode>> matches = queryMatching();
             System.out.println("Device ID: " + deviceID);
             String label = getMatchLabel(matches.get(0).getKey().toString(), deviceID);
@@ -33,55 +37,75 @@ class SemanticController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Device not found");
             }
             System.out.println("Label: " + label);
-            String[] service = getServiceAPI(label, matches.get(0).getValue().toString());
+            String[] service = getServicePostAPI(label, matches.get(0).getValue().toString());
             System.out.println("Service: " + Arrays.toString(service));
             if (service[0] == null || service[1] == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Service not found");
             }
-            Measurement measurement = new Measurement();
-            measurement.setTimestamp(observation.getTimestamp());
-            measurement.setValue(observation.getValue());
             URL = "http://" + service[0] + "/" + service[1];
-            System.out.println(URL);
-            cache.put(deviceID, URL);
+            String[] fields = service[2].split(" ");
+            String[] fieldTypes = service[3].split(" ");
+            //TODO use fieldTypes
+            serviceFields = new ArrayList<>(Arrays.asList(fields));
+            cache.put(deviceID, new Method(URL, serviceFields));
         } else {
-            URL = cache.get(deviceID);
+            URL = cache.get(deviceID).getURL();
+            serviceFields = cache.get(deviceID).getFields();
         }
-        return template.postForEntity(URL, observation, String.class);
+        JsonObject requestJson = new JsonObject();
+        //TODO what if there is no field matches?
+        for (String serviceField : serviceFields) {
+            try {
+                requestJson.addProperty(serviceField, body.get(serviceField).getAsNumber());
+            } catch (NullPointerException e) {
+                System.out.println("Field " + serviceField + " not found. Skipping.");
+            }
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(requestJson.toString(), headers);
+        return template.postForEntity(URL, entity, String.class);
     }
 
-    private static String[] getServiceAPI(String label, String matched) {
-        String[] info = new String[2];
+    private static String[] getServicePostAPI(String label, String matched) {
+        String[] info = new String[4];
         String qs = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
                 "PREFIX : <http://www.semanticweb.org/ca.mendoza968/ontologies/services#>\n" +
-                "SELECT ?URI ?methodValue\n" +
+                "SELECT ?URI ?methodValue (group_concat(?bodyLabel) as ?bodyLabels) (group_concat(?dataTypeLabel) as ?dataTypes)\n" +
                 "WHERE {\n" +
                 " ?service a :Service; (:|!:)* ?property .\n" +
-                " ?property a <" + matched + ">; rdfs:label '" + label + "'.\n" +
+                " ?property a <" + matched + ">; rdfs:label '" + label + "' .\n" +
                 " ?service :hasAPIURL ?URL; :hasMethod ?method .\n" +
-                " ?URL :hasStringValue ?URI.\n" +
+                " ?URL :hasStringValue ?URI .\n" +
                 " ?method a :Create; :hasStringValue ?methodValue .\n" +
-                "}";
-        System.out.println(qs);
-        QueryExecution exec = QueryExecutionFactory.sparqlService("http://localhost:3030/virtual/sparql", QueryFactory.create(qs));
+                " ?method :hasBodyField ?bodyField .\n" +
+                " ?bodyField rdfs:label ?bodyLabel; :hasDataType ?dataType .\n" +
+                " ?dataType rdfs:label ?dataTypeLabel .\n" +
+                "}\n" +
+                "GROUP BY ?URI ?methodValue";
+        QueryExecution exec = QueryExecutionFactory.sparqlService("http://localhost:3030/virtual/query", QueryFactory.create(qs));
 
+        //TODO Body fields must be optional
         ResultSet results = exec.execSelect();
+
         if (results.hasNext()) {
             QuerySolution next = results.next();
             info[0] = next.get("URI").toString();
             info[1] = next.get("methodValue").toString();
+            info[2] = next.get("bodyLabels").toString();
+            info[3] = next.get("dataTypes").toString();
         }
         return info;
     }
 
     private static String getMatchLabel(String matched, String deviceId) {
-        //System.out.println("Matched Class: " + matched);
+        System.out.println("Matched Class: " + matched);
         String qs = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
                 "PREFIX : <http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#>\n" +
                 "SELECT ?label\n" +
                 "WHERE {\n" +
-                " ?device a :Sensor; :hasDeviceId '" + deviceId + "'; (:|!:)* ?property .\n" +
-                " ?property a <" + matched + ">; rdfs:label ?label\n" +
+                " ?device a :Sensor; :hasDeviceId '" + deviceId + "'; (:|!:)* ?u .\n" +
+                " ?u a <" + matched + ">; rdfs:label ?label\n" +
                 "}";
         QueryExecution exec = QueryExecutionFactory.sparqlService("http://localhost:3030/fisica/query", QueryFactory.create(qs));
 

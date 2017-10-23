@@ -30,19 +30,19 @@ package com.camendoza94.semanticinterface;
 import fr.inrialpes.exmo.align.impl.BasicParameters;
 import fr.inrialpes.exmo.align.impl.method.StringDistAlignment;
 import fr.inrialpes.exmo.align.impl.renderer.RDFRendererVisitor;
-import org.semanticweb.owl.align.*;
+import org.semanticweb.owl.align.Alignment;
+import org.semanticweb.owl.align.AlignmentProcess;
+import org.semanticweb.owl.align.AlignmentVisitor;
 
-// SAX standard classes
-import org.xml.sax.SAXException;
-
-// Java standard classes
-import java.io.PrintWriter;
 import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
-import java.io.File;
-import java.nio.charset.StandardCharsets;
+import java.io.PrintWriter;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
+
+// SAX standard classes
+// Java standard classes
 
 /**
  * The Skeleton of code for embeding the alignment API
@@ -50,7 +50,7 @@ import java.util.Properties;
  * Takes two files as arguments and align them.
  */
 
-public class Skeleton {
+class Skeleton {
 
     public static void main( String[] args ) {
         URI onto1 = null; //TODO Connect to Fuseki and get both ontologies
@@ -81,6 +81,6 @@ public class Skeleton {
             writer.flush();
             writer.close();
 
-        } catch (Exception e) { e.printStackTrace(); };
+        } catch (Exception e) { e.printStackTrace(); }
     }
 }

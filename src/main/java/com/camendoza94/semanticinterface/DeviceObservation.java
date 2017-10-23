@@ -1,49 +1,24 @@
 package com.camendoza94.semanticinterface;
 
-import org.springframework.data.annotation.Id;
+class DeviceObservation {
 
-import java.util.Date;
-
-public class DeviceObservation {
-    @Id
-    private String id;
-
-    //TODO change to String (JSON) to store more fields
-    private double value;
-
-    private Date timestamp;
+    private String payload;
 
     private String deviceId;
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public double getValue() {
-        return value;
-    }
-
-    public void setValue(double value) {
-        this.value = value;
-    }
-
-    public Date getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public String getDeviceId() {
+    String getDeviceId() {
         return deviceId;
+    }
+
+    String getPayload() {
+        return payload;
     }
 
     public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;
+    }
+
+    public void setPayload(String payload) {
+        this.payload = payload;
     }
 }
