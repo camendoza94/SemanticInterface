@@ -143,7 +143,7 @@
     <!-- http://www.semanticweb.org/ca.mendoza968/ontologies/services#Method -->
 
     <owl:Class rdf:about="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Method">
-        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Repository"/>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Reference"/>
     </owl:Class>
     
 
@@ -182,14 +182,6 @@
     
 
 
-    <!-- http://www.semanticweb.org/ca.mendoza968/ontologies/services#Repository -->
-
-    <owl:Class rdf:about="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Repository">
-        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Reference"/>
-    </owl:Class>
-    
-
-
     <!-- http://www.semanticweb.org/ca.mendoza968/ontologies/services#Service -->
 
     <owl:Class rdf:about="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Service"/>
@@ -199,7 +191,7 @@
     <!-- http://www.semanticweb.org/ca.mendoza968/ontologies/services#URL -->
 
     <owl:Class rdf:about="http://www.semanticweb.org/ca.mendoza968/ontologies/services#URL">
-        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Service"/>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Reference"/>
     </owl:Class>
     
 
