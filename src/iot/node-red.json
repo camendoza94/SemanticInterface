@@ -1,0 +1,198 @@
+[
+    {
+        "id": "b7ec0db0.75bc8",
+        "type": "inject",
+        "z": "871e42d9.28ecb",
+        "name": "sensorTime",
+        "topic": "roomTime",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "x": 210.45455932617188,
+        "y": 273.6363263130188,
+        "wires": [
+            [
+                "42f635b3.79585c",
+                "f0adcb7a.562758"
+            ]
+        ]
+    },
+    {
+        "id": "175626f1.6ea899",
+        "type": "function",
+        "z": "871e42d9.28ecb",
+        "name": "Format Temperature",
+        "func": "var res = {};\nvar tempArray = [];\nvar tempUnit = \"\";\n\ntempString = msg.payload;\nres.topic = \"roomTemperature\";\nres.payload = {};\n\nres.payload = {\"payload\":{\"value\":parseInt(tempString)}, \"deviceId\": \"TMP36\"};\nreturn res;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 475.90914154052734,
+        "y": 139.09088945388794,
+        "wires": [
+            [
+                "fe47aa9d.3b8808",
+                "9393fb6c.df9c48"
+            ]
+        ]
+    },
+    {
+        "id": "42f635b3.79585c",
+        "type": "function",
+        "z": "871e42d9.28ecb",
+        "name": "Format Time",
+        "func": "var res = {};\n\nepoch = msg.payload;\ntopic = msg.topic;\n\ndatetime = new Date(epoch);\n\nres.payload = datetime;\nres.topic = topic;\n\nreturn res;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 453.63635635375977,
+        "y": 275.4545307159424,
+        "wires": [
+            [
+                "518e212.e4887e",
+                "9393fb6c.df9c48"
+            ]
+        ]
+    },
+    {
+        "id": "f0adcb7a.562758",
+        "type": "debug",
+        "z": "871e42d9.28ecb",
+        "name": "before format",
+        "active": false,
+        "console": "false",
+        "complete": "payload",
+        "x": 464.5454559326172,
+        "y": 232.7272605895996,
+        "wires": []
+    },
+    {
+        "id": "fe47aa9d.3b8808",
+        "type": "debug",
+        "z": "871e42d9.28ecb",
+        "name": "after format",
+        "active": false,
+        "console": "false",
+        "complete": "payload",
+        "x": 679.0909042358398,
+        "y": 101.81816101074219,
+        "wires": []
+    },
+    {
+        "id": "518e212.e4887e",
+        "type": "debug",
+        "z": "871e42d9.28ecb",
+        "name": "after format",
+        "active": false,
+        "console": "false",
+        "complete": "payload",
+        "x": 674.5454254150391,
+        "y": 274.54543113708496,
+        "wires": []
+    },
+    {
+        "id": "3512d663.2967ea",
+        "type": "debug",
+        "z": "871e42d9.28ecb",
+        "name": "after merge",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 1050,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "94e4df0f.16d84",
+        "type": "function",
+        "z": "871e42d9.28ecb",
+        "name": "Content Type",
+        "func": "msg.headers = {\"Content-Type\":\"application/json\"};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 966.5655822753906,
+        "y": 288.8888635635376,
+        "wires": [
+            [
+                "a0861663.1169d8"
+            ]
+        ]
+    },
+    {
+        "id": "9393fb6c.df9c48",
+        "type": "function",
+        "z": "871e42d9.28ecb",
+        "name": "Merge 2Messages",
+        "func": "context.data = context.data || new Object();\n\nswitch(msg.topic)\n{\n    case \"roomTime\":\n        context.data.timestamp = msg.payload;\n        msg = null;\n        break;\n    case \"roomTemperature\":\n        context.data.payload = JSON.stringify(msg.payload.payload);\n        context.data.deviceId = msg.payload.deviceId;\n        msg = null;\n        break;\n    default: \n\t    msg = null;\n\t    break;\n}\n\nif(context.data.timestamp != null && context.data.payload != null) {\n\tres = {};\n\tcontext.data = JSON.stringify(context.data);\n\tres.payload = context.data;\n\tres.topic = \"roomTemperature\";\n\tcontext.data = null;\n\treturn res;\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 731,
+        "y": 183.3415985107422,
+        "wires": [
+            [
+                "3512d663.2967ea",
+                "94e4df0f.16d84"
+            ]
+        ]
+    },
+    {
+        "id": "8a49ef35.b8e78",
+        "type": "inject",
+        "z": "871e42d9.28ecb",
+        "name": "sensorTemperature",
+        "topic": "roomTemperature",
+        "payload": "15",
+        "payloadType": "num",
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "x": 194,
+        "y": 160,
+        "wires": [
+            [
+                "175626f1.6ea899",
+                "aec3e7d7.485d38"
+            ]
+        ]
+    },
+    {
+        "id": "aec3e7d7.485d38",
+        "type": "debug",
+        "z": "871e42d9.28ecb",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 378.88888888888886,
+        "y": 25.555555555555554,
+        "wires": []
+    },
+    {
+        "id": "a0861663.1169d8",
+        "type": "http request",
+        "z": "871e42d9.28ecb",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "url": "http://localhost:1234/interface",
+        "tls": "",
+        "x": 1410,
+        "y": 200,
+        "wires": [
+            [
+                "67ce63f7.6082ec"
+            ]
+        ]
+    },
+    {
+        "id": "67ce63f7.6082ec",
+        "type": "debug",
+        "z": "871e42d9.28ecb",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 1434.073013305664,
+        "y": 77.78820037841797,
+        "wires": []
+    }
+]
