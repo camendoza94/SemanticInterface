@@ -1,59 +1,93 @@
-<duke> 
-  <schema>
-    <threshold>0.7</threshold>
-  <!-- TODO Inclue method fields in matching -->
-    <property type="id">
-      <name>ID</name>
-    </property>
-    
-    <property>
-      <name>NAME</name> 
-      <comparator>no.priv.garshol.duke.comparators.Levenshtein</comparator>
-      <low>0.09</low>
-      <high>1</high>
-    </property>       
-  </schema>
+<duke>
+    <schema>
+        <threshold>0.75</threshold>
+        <property type="id">
+            <name>ID</name>
+        </property>
+        <property>
+            <name>NAME</name>
+            <comparator>no.priv.garshol.duke.comparators.Levenshtein</comparator>
+            <low>0.1</low>
+            <high>0.8</high>
+        </property>
+        <property>
+            <name>FIELDS</name>
+            <comparator>no.priv.garshol.duke.comparators.Levenshtein</comparator>
+            <low>0.3</low>
+            <high>0.6</high>
+        </property>
+        <property>
+            <name>TYPES</name>
+            <comparator>no.priv.garshol.duke.comparators.Levenshtein</comparator>
+            <low>0.3</low>
+            <high>0.6</high>
+        </property>
+    </schema>
 
-  <database class="no.priv.garshol.duke.databases.InMemoryDatabase">    
-  </database>
-  
-  <group>
-	  <sparql>
-	    <param name="endpoint" value="http://localhost:3030/virtual/query"/>
-	    <param name="triple-mode" value="false"/>
-	    <param name="query" value='
-	PREFIX : &lt;http://www.semanticweb.org/ca.mendoza968/ontologies/services#>
+    <database class="no.priv.garshol.duke.databases.InMemoryDatabase">
+    </database>
+
+    <group>
+        <sparql>
+            <param name="endpoint" value="http://localhost:3030/virtual/query"/>
+            <param name="triple-mode" value="false"/>
+            <param name="query" value='
+PREFIX : &lt;http://www.semanticweb.org/ca.mendoza968/ontologies/services#>
 PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#>
-SELECT ?property ?propertyName
+SELECT ?property ?propertyName (group_concat(?bodyLabel) as ?bodyLabels) (group_concat(?dataTypeLabel) as ?dataTypes)
 WHERE {
-  ?property a :Property; rdfs:label ?propertyName
-}    '/>
+  ?service :aboutProperty ?property; :hasMethod ?method .
+  ?property rdfs:label ?propertyName .
+  ?method :hasBodyField ?bodyField .
+  ?bodyField rdfs:label ?bodyLabel; :hasDataType ?dataType .
+  ?dataType rdfs:label ?dataTypeLabel .
+}
+GROUP BY ?property ?propertyName'/>
 
-	    <column name="property"
-	            property="ID"/>
-	    <column name="propertyName"
-	            cleaner="no.priv.garshol.duke.cleaners.LowerCaseNormalizeCleaner"
-	            property="NAME"/>
-	  </sparql>
-  </group>
+            <column name="property"
+                    property="ID"/>
+            <column name="propertyName"
+                    cleaner="no.priv.garshol.duke.cleaners.LowerCaseNormalizeCleaner"
+                    property="NAME"/>
+            <column name="bodyLabels"
+                    cleaner="no.priv.garshol.duke.cleaners.LowerCaseNormalizeCleaner"
+                    property="FIELDS"/>
+            <column name="dataTypes"
+                    cleaner="no.priv.garshol.duke.cleaners.LowerCaseNormalizeCleaner"
+                    property="TYPES"/>
 
-  <group>
-	  <sparql>
-	    <param name="endpoint" value="http://localhost:3030/fisica/query"/>
-	    <param name="triple-mode" value="false"/>
-	    <param name="query" value='
-	PREFIX : &lt;http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#>
-	PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#>
-	SELECT ?property ?propertyName
-	WHERE {
-	?property a :Property; rdfs:label ?propertyName
-	}    '/>
+        </sparql>
+    </group>
 
-	    <column name="property"
-	            property="ID"/>
-	    <column name="propertyName"
-	            cleaner="no.priv.garshol.duke.cleaners.LowerCaseNormalizeCleaner"
-	            property="NAME"/>
-	  </sparql>
-  </group>  
+    <group>
+        <sparql>
+            <param name="endpoint" value="http://localhost:3030/fisica/query"/>
+            <param name="triple-mode" value="false"/>
+            <param name="query" value='
+PREFIX : &lt;http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#>
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?property ?propertyName (group_concat(?bodyLabel) as ?bodyLabels) (group_concat(?dataTypeLabel) as ?dataTypes)
+WHERE {
+  ?measurementCapability a :MeasurementCapability .
+  ?measurementCapability :forProperty ?property; :hasBodyField ?bodyField .
+  ?property rdfs:label ?propertyName .
+  ?bodyField rdfs:label ?bodyLabel; :hasDataType ?dataType .
+  ?dataType rdfs:label ?dataTypeLabel .
+}
+GROUP BY ?property ?propertyName    '/>
+
+            <column name="property"
+                    property="ID"/>
+            <column name="propertyName"
+                    cleaner="no.priv.garshol.duke.cleaners.LowerCaseNormalizeCleaner"
+                    property="NAME"/>
+            <column name="bodyLabels"
+                    cleaner="no.priv.garshol.duke.cleaners.LowerCaseNormalizeCleaner"
+                    property="FIELDS"/>
+            <column name="dataTypes"
+                    cleaner="no.priv.garshol.duke.cleaners.LowerCaseNormalizeCleaner"
+                    property="TYPES"/>
+
+        </sparql>
+    </group>
 </duke>

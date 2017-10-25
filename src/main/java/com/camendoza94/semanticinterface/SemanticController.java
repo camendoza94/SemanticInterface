@@ -58,7 +58,6 @@ class SemanticController {
             serviceTypes = cache.get(deviceID).getTypes();
         }
         JsonObject requestJson = new JsonObject();
-        //TODO what if there is no field matches?
         for (int i = 0; i < serviceFields.size(); i++) {
             String serviceField = serviceFields.get(i);
             try {
@@ -93,7 +92,6 @@ class SemanticController {
                 "GROUP BY ?URI ?methodValue";
         QueryExecution exec = QueryExecutionFactory.sparqlService("http://localhost:3030/virtual/query", QueryFactory.create(qs));
 
-        //TODO Body fields must be optional
         ResultSet results = exec.execSelect();
 
         if (results.hasNext()) {
@@ -123,7 +121,7 @@ class SemanticController {
 //                "GROUP BY ?URI ?methodValue";
 //        QueryExecution exec = QueryExecutionFactory.sparqlService("http://localhost:3030/virtual/query", QueryFactory.create(qs));
 //
-//        //TODO Body fields must be optional
+//
 //        ResultSet results = exec.execSelect();
 //
 //        if (results.hasNext()) {
@@ -175,8 +173,8 @@ class SemanticController {
 //        return "";
 //    }
 
-    private static HashMap<String,String> getMatchingFromCSV() {
-        HashMap<String,String> matches = new HashMap<>();
+    private static HashMap<String, String> getMatchingFromCSV() {
+        HashMap<String, String> matches = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader("src/data/link.csv"))) {
             String line = br.readLine();
             while (line != null) {

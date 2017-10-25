@@ -215,33 +215,6 @@
     
 
 
-    <!-- http://www.semanticweb.org/ca.mendoza968/ontologies/services#Double -->
-
-    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Double">
-        <rdf:type rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#DataType"/>
-        <rdfs:label>double</rdfs:label>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.semanticweb.org/ca.mendoza968/ontologies/services#Integer -->
-
-    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Integer">
-        <rdf:type rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#DataType"/>
-        <rdfs:label>integer</rdfs:label>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.semanticweb.org/ca.mendoza968/ontologies/services#Long -->
-
-    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Long">
-        <rdf:type rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#DataType"/>
-        <rdfs:label>long</rdfs:label>
-    </owl:NamedIndividual>
-    
-
-
     <!-- http://www.semanticweb.org/ca.mendoza968/ontologies/services#Luminosity -->
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Luminosity">
@@ -267,6 +240,15 @@
         <aboutProperty rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Luminosity"/>
         <hasAPIURL rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#LuminosityAPI"/>
         <hasMethod rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#POST_luminosity"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ca.mendoza968/ontologies/services#Number -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Number">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#DataType"/>
+        <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">number</rdfs:label>
     </owl:NamedIndividual>
     
 
@@ -297,7 +279,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ca.mendoza968/ontologies/services#String">
         <rdf:type rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#DataType"/>
-        <rdfs:label>string</rdfs:label>
+        <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">string</rdfs:label>
     </owl:NamedIndividual>
     
 
@@ -335,7 +317,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Timestamp">
         <rdf:type rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#BodyField"/>
-        <hasDataType rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Long"/>
+        <hasDataType rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Number"/>
         <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">timestamp</rdfs:label>
     </owl:NamedIndividual>
     
@@ -345,7 +327,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Value">
         <rdf:type rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#BodyField"/>
-        <hasDataType rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Double"/>
+        <hasDataType rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Number"/>
         <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">value</rdfs:label>
     </owl:NamedIndividual>
     
