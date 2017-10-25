@@ -317,7 +317,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Timestamp">
         <rdf:type rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#BodyField"/>
-        <hasDataType rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Number"/>
+        <hasDataType rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#String"/>
         <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">timestamp</rdfs:label>
     </owl:NamedIndividual>
     

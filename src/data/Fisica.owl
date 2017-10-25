@@ -454,7 +454,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#Timestamp">
         <rdf:type rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#BodyField"/>
-        <iotdevices:hasDataType rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#Number"/>
+        <iotdevices:hasDataType rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#String"/>
         <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">timestamp</rdfs:label>
     </owl:NamedIndividual>
     
