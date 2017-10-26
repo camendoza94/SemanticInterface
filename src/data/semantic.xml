@@ -34,7 +34,7 @@
             <param name="query" value='
 PREFIX : &lt;http://www.semanticweb.org/ca.mendoza968/ontologies/services#>
 PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#>
-SELECT ?property ?propertyName (group_concat(?bodyLabel) as ?bodyLabels) (group_concat(?dataTypeLabel) as ?dataTypes)
+SELECT ?method ?propertyName (group_concat(?bodyLabel) as ?bodyLabels) (group_concat(?dataTypeLabel) as ?dataTypes)
 WHERE {
   ?service :aboutProperty ?property; :hasMethod ?method .
   ?property rdfs:label ?propertyName .
@@ -42,9 +42,9 @@ WHERE {
   ?bodyField rdfs:label ?bodyLabel; :hasDataType ?dataType .
   ?dataType rdfs:label ?dataTypeLabel .
 }
-GROUP BY ?property ?propertyName'/>
+GROUP BY ?method ?propertyName'/>
 
-            <column name="property"
+            <column name="method"
                     property="ID"/>
             <column name="propertyName"
                     cleaner="no.priv.garshol.duke.cleaners.LowerCaseNormalizeCleaner"
@@ -66,17 +66,18 @@ GROUP BY ?property ?propertyName'/>
             <param name="query" value='
 PREFIX : &lt;http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#>
 PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#>
-SELECT ?property ?propertyName (group_concat(?bodyLabel) as ?bodyLabels) (group_concat(?dataTypeLabel) as ?dataTypes)
+SELECT ?deviceID ?propertyName (group_concat(?bodyLabel) as ?bodyLabels) (group_concat(?dataTypeLabel) as ?dataTypes)
 WHERE {
+  ?device :hasMeasurementCapability ?measurementCapability; :hasDeviceId ?deviceID .
   ?measurementCapability a :MeasurementCapability .
   ?measurementCapability :forProperty ?property; :hasBodyField ?bodyField .
   ?property rdfs:label ?propertyName .
   ?bodyField rdfs:label ?bodyLabel; :hasDataType ?dataType .
   ?dataType rdfs:label ?dataTypeLabel .
 }
-GROUP BY ?property ?propertyName    '/>
+GROUP BY ?deviceID ?propertyName    '/>
 
-            <column name="property"
+            <column name="deviceID"
                     property="ID"/>
             <column name="propertyName"
                     cleaner="no.priv.garshol.duke.cleaners.LowerCaseNormalizeCleaner"
