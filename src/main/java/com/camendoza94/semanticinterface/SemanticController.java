@@ -1,5 +1,6 @@
 package com.camendoza94.semanticinterface;
 
+import com.camendoza94.matching.DukeMatching;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.jena.query.*;
@@ -9,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import org.xml.sax.SAXException;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -110,6 +113,13 @@ class SemanticController {
                 String methodClass = line.split(",")[2].trim();
                 matches.put(deviceId, methodClass);
                 line = br.readLine();
+            }
+        } catch (FileNotFoundException e) {
+            try {
+                DukeMatching.matching();
+            } catch (IOException | SAXException e1) {
+                System.out.println("Error while matching.");
+                e1.printStackTrace();
             }
         } catch (IOException e) {
             System.out.println("Couldn't find any matches.");

@@ -1,24 +1,24 @@
 <duke>
     <schema>
-        <threshold>0.75</threshold>
+        <threshold>0.7</threshold>
         <property type="id">
             <name>ID</name>
         </property>
         <property>
             <name>NAME</name>
-            <comparator>no.priv.garshol.duke.comparators.Levenshtein</comparator>
+            <comparator>no.priv.garshol.duke.comparators.QGramComparator</comparator>
             <low>0.1</low>
             <high>0.8</high>
         </property>
         <property>
             <name>FIELDS</name>
-            <comparator>no.priv.garshol.duke.comparators.Levenshtein</comparator>
+            <comparator>no.priv.garshol.duke.comparators.QGramComparator</comparator>
             <low>0.3</low>
             <high>0.6</high>
         </property>
         <property>
             <name>TYPES</name>
-            <comparator>no.priv.garshol.duke.comparators.Levenshtein</comparator>
+            <comparator>no.priv.garshol.duke.comparators.QGramComparator</comparator>
             <low>0.3</low>
             <high>0.6</high>
         </property>
