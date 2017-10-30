@@ -1,6 +1,6 @@
 <duke>
     <schema>
-        <threshold>0.7</threshold>
+        <threshold>0.75</threshold>
         <property type="id">
             <name>ID</name>
         </property>
@@ -11,8 +11,20 @@
             <high>0.8</high>
         </property>
         <property>
-            <name>FIELDS</name>
+            <name>NFIELDS</name>
             <comparator>no.priv.garshol.duke.comparators.NumericComparator</comparator>
+            <low>0.3</low>
+            <high>0.6</high>
+        </property>
+        <property>
+            <name>FIELDS</name>
+            <comparator>no.priv.garshol.duke.comparators.QGramComparator</comparator>
+            <low>0.3</low>
+            <high>0.6</high>
+        </property>
+        <property>
+            <name>TYPES</name>
+            <comparator>no.priv.garshol.duke.comparators.QGramComparator</comparator>
             <low>0.3</low>
             <high>0.6</high>
         </property>
@@ -28,11 +40,13 @@
             <param name="query" value='
 PREFIX : &lt;http://www.semanticweb.org/ca.mendoza968/ontologies/services#>
 PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#>
-SELECT ?method ?propertyName (COUNT(?bodyField) as ?bodyFields)
+SELECT ?method ?propertyName (COUNT(?bodyField) as ?bodyFields) (group_concat(?bodyLabel) as ?bodyLabels) (group_concat(?dataTypeLabel) as ?dataTypes)
 WHERE {
   ?service :aboutProperty ?property; :hasMethod ?method .
   ?property rdfs:label ?propertyName .
   ?method :hasBodyField ?bodyField .
+  ?bodyField rdfs:label ?bodyLabel; :hasDataType ?dataType .
+  ?dataType rdfs:label ?dataTypeLabel .
 }
 GROUP BY ?method ?propertyName'/>
 
@@ -42,7 +56,13 @@ GROUP BY ?method ?propertyName'/>
                     cleaner="no.priv.garshol.duke.cleaners.LowerCaseNormalizeCleaner"
                     property="NAME"/>
             <column name="bodyFields"
+                    property="NFIELDS"/>
+            <column name="bodyLabels"
+                    cleaner="no.priv.garshol.duke.cleaners.LowerCaseNormalizeCleaner"
                     property="FIELDS"/>
+            <column name="dataTypes"
+                    cleaner="no.priv.garshol.duke.cleaners.LowerCaseNormalizeCleaner"
+                    property="TYPES"/>
 
         </sparql>
     </group>
@@ -54,12 +74,14 @@ GROUP BY ?method ?propertyName'/>
             <param name="query" value='
 PREFIX : &lt;http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#>
 PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#>
-SELECT ?deviceID ?propertyName (COUNT(?bodyField) as ?bodyFields)
+SELECT ?deviceID ?propertyName (COUNT(?bodyField) as ?bodyFields) (group_concat(?bodyLabel) as ?bodyLabels) (group_concat(?dataTypeLabel) as ?dataTypes)
 WHERE {
  ?device :hasMeasurementCapability ?measurementCapability; :hasDeviceId ?deviceID .
  ?measurementCapability a :MeasurementCapability .
  ?measurementCapability :forProperty ?property; :hasBodyField ?bodyField .
  ?property rdfs:label ?propertyName .
+ ?bodyField rdfs:label ?bodyLabel; :hasDataType ?dataType .
+ ?dataType rdfs:label ?dataTypeLabel .
 }
 GROUP BY ?deviceID ?propertyName'/>
 
@@ -69,7 +91,13 @@ GROUP BY ?deviceID ?propertyName'/>
                     cleaner="no.priv.garshol.duke.cleaners.LowerCaseNormalizeCleaner"
                     property="NAME"/>
             <column name="bodyFields"
+                    property="NFIELDS"/>
+            <column name="bodyLabels"
+                    cleaner="no.priv.garshol.duke.cleaners.LowerCaseNormalizeCleaner"
                     property="FIELDS"/>
+            <column name="dataTypes"
+                    cleaner="no.priv.garshol.duke.cleaners.LowerCaseNormalizeCleaner"
+                    property="TYPES"/>
 
         </sparql>
     </group>
