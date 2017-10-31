@@ -34,21 +34,8 @@
     </database>
 
     <group>
-        <sparql>
-            <param name="endpoint" value="http://localhost:3030/virtual/query"/>
-            <param name="triple-mode" value="false"/>
-            <param name="query" value='
-PREFIX : &lt;http://www.semanticweb.org/ca.mendoza968/ontologies/services#>
-PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#>
-SELECT ?method ?propertyName (COUNT(?bodyField) as ?bodyFields) (group_concat(?bodyLabel) as ?bodyLabels) (group_concat(?dataTypeLabel) as ?dataTypes)
-WHERE {
-  ?service :aboutProperty ?property; :hasMethod ?method .
-  ?property rdfs:label ?propertyName .
-  ?method :hasBodyField ?bodyField .
-  ?bodyField rdfs:label ?bodyLabel; :hasDataType ?dataType .
-  ?dataType rdfs:label ?dataTypeLabel .
-}
-GROUP BY ?method ?propertyName'/>
+        <csv>
+            <param name="input-file" value="virtualTest.csv"/>
 
             <column name="method"
                     property="ID"/>
@@ -64,26 +51,12 @@ GROUP BY ?method ?propertyName'/>
                     cleaner="no.priv.garshol.duke.cleaners.LowerCaseNormalizeCleaner"
                     property="TYPES"/>
 
-        </sparql>
+        </csv>
     </group>
 
     <group>
-        <sparql>
-            <param name="endpoint" value="http://localhost:3030/fisica/query"/>
-            <param name="triple-mode" value="false"/>
-            <param name="query" value='
-PREFIX : &lt;http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#>
-PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#>
-SELECT ?deviceID ?propertyName (COUNT(?bodyField) as ?bodyFields) (group_concat(?bodyLabel) as ?bodyLabels) (group_concat(?dataTypeLabel) as ?dataTypes)
-WHERE {
- ?device :hasMeasurementCapability ?measurementCapability; :hasDeviceId ?deviceID .
- ?measurementCapability a :MeasurementCapability .
- ?measurementCapability :forProperty ?property; :hasBodyField ?bodyField .
- ?property rdfs:label ?propertyName .
- ?bodyField rdfs:label ?bodyLabel; :hasDataType ?dataType .
- ?dataType rdfs:label ?dataTypeLabel .
-}
-GROUP BY ?deviceID ?propertyName'/>
+        <csv>
+            <param name="input-file" value="fisicaTest.csv"/>
 
             <column name="deviceID"
                     property="ID"/>
@@ -99,6 +72,6 @@ GROUP BY ?deviceID ?propertyName'/>
                     cleaner="no.priv.garshol.duke.cleaners.LowerCaseNormalizeCleaner"
                     property="TYPES"/>
 
-        </sparql>
+        </csv>
     </group>
 </duke>

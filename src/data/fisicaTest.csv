@@ -1,0 +1,5 @@
+deviceID,propertyName,bodyFields,bodyLabels,dataTypes
+A,temperatura,2,value time,number string
+B,temperature,1,value,number
+C,luminos,2,value time,number string
+D,temperatura,3,value time alert,number string string
