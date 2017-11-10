@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SemanticinterfaceApplication {
+public class SemanticInterfaceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SemanticinterfaceApplication.class, args);
+		SpringApplication.run(SemanticInterfaceApplication.class, args);
 	}
 }
