@@ -1,22 +1,19 @@
 package com.camendoza94.semanticinterface;
 
 import com.camendoza94.matching.DukeMatching;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.apache.jena.query.*;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 import org.xml.sax.SAXException;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -24,54 +21,17 @@ import java.util.HashMap;
 @RequestMapping("/interface")
 class SemanticController {
 
-    private final HashMap<String, Method> cache = new HashMap<>();
-
-    private final RestTemplate template = new RestTemplate();
-
     @RequestMapping(method = RequestMethod.POST)
-    ResponseEntity<String> requestService(@RequestBody DeviceObservation observation) {
-        String deviceID = observation.getDeviceId();
-        String URL;
-        ArrayList<String> serviceFields;
-        ArrayList<String> serviceTypes;
-        JsonParser parser = new JsonParser();
-        JsonObject body = parser.parse(observation.getPayload()).getAsJsonObject();
-        System.out.println("Body: " + body);
-        if (cache.get(deviceID) == null) {
-            HashMap<String, String> matches = getMatchingFromCSV();
-            System.out.println("Device ID: " + deviceID);
-            String[] service = getServicePostAPI(matches.get(deviceID));
-            System.out.println("Service: " + Arrays.toString(service));
-            if (service[0] == null || service[1] == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Service not found");
-            }
-            URL = "http://" + service[0] + "/" + service[1];
-            String[] fields = service[2].split(" ");
-            String[] fieldTypes = service[3].split(" ");
-            serviceFields = new ArrayList<>(Arrays.asList(fields));
-            serviceTypes = new ArrayList<>(Arrays.asList(fieldTypes));
-            cache.put(deviceID, new Method(URL, serviceFields, serviceTypes));
-        } else {
-            URL = cache.get(deviceID).getURL();
-            serviceFields = cache.get(deviceID).getFields();
-            serviceTypes = cache.get(deviceID).getTypes();
+    ResponseEntity<String> requestService(@RequestBody String deviceID) {
+        HashMap<String, String> matches = getMatchingFromCSV();
+        System.out.println("Device ID: " + deviceID);
+        String[] service = getServicePostAPI(matches.get(deviceID));
+        System.out.println("Service: " + Arrays.toString(service));
+        if (service[0] == null || service[1] == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Service not found");
         }
-        JsonObject requestJson = new JsonObject();
-        for (int i = 0; i < serviceFields.size(); i++) {
-            String serviceField = serviceFields.get(i);
-            try {
-                if (serviceTypes.get(i).equalsIgnoreCase("String"))
-                    requestJson.addProperty(serviceField, body.get(serviceField).getAsString());
-                else
-                    requestJson.addProperty(serviceField, body.get(serviceField).getAsNumber());
-            } catch (NullPointerException e) {
-                System.out.println("Field " + serviceField + " not found. Skipping...");
-            }
-        }
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(requestJson.toString(), headers);
-        return template.postForEntity(URL, entity, String.class);
+        String URL =  service[0] + "/" + service[1];
+        return ResponseEntity.status(HttpStatus.OK).body(URL);
     }
 
     private static String[] getServicePostAPI(String matched) {
