@@ -14,7 +14,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 @RestController
@@ -23,15 +23,22 @@ class SemanticController {
 
     @RequestMapping(method = RequestMethod.POST)
     ResponseEntity<String> requestService(@RequestBody String deviceID) {
-        HashMap<String, String> matches = getMatchingFromCSV();
+        HashMap<String, ArrayList<String>> matches = getMatchingFromCSV();
         System.out.println("Device ID: " + deviceID);
-        String[] service = getServicePostAPI(matches.get(deviceID));
-        System.out.println("Service: " + Arrays.toString(service));
-        if (service[0] == null || service[1] == null) {
+        ArrayList<String[]> services = new ArrayList<>();
+        for(String match: matches.get(deviceID)) {
+            services.add(getServicePostAPI(match));
+        }
+        System.out.println("Service: " + services);
+        //TODO Manage exceptions
+        if (services.get(0)[0] == null || services.get(0)[0] == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Service not found");
         }
-        String URL =  service[0] + "/" + service[1];
-        return ResponseEntity.status(HttpStatus.OK).body(URL);
+        StringBuilder URL = new StringBuilder();
+        for(String[] service: services) {
+            URL.append(service[0]).append("/").append(service[1]).append("\n");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(URL.toString());
     }
 
     private static String[] getServicePostAPI(String matched) {
@@ -63,15 +70,16 @@ class SemanticController {
         return info;
     }
 
-    private static HashMap<String, String> getMatchingFromCSV() {
-        HashMap<String, String> matches = new HashMap<>();
+    private static HashMap<String, ArrayList<String>> getMatchingFromCSV() {
+        HashMap<String, ArrayList<String>> matches = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader("src/data/link.csv"))) {
             String line = br.readLine();
             while (line != null) {
                 System.out.println(line);
                 String deviceId = line.split(",")[1].trim();
                 String methodClass = line.split(",")[2].trim();
-                matches.put(deviceId, methodClass);
+                matches.computeIfAbsent(deviceId, k -> new ArrayList<>()); //no ArrayList assigned, create new ArrayList
+                matches.get(deviceId).add(methodClass);
                 line = br.readLine();
             }
         } catch (FileNotFoundException e) {

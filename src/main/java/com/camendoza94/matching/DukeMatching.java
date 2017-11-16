@@ -13,7 +13,6 @@ import java.util.Collection;
 
 //Modified code from Duke https://github.com/larsga/Duke
 public class DukeMatching {
-    private final static int DEFAULT_BATCH_SIZE = 40000;
 
     public static void matching() throws IOException, SAXException {
         Configuration config = ConfigLoader.load("src/data/semantic.xml");
@@ -21,7 +20,7 @@ public class DukeMatching {
         proc.setThreads(4);
         LinkFileListener linkfile = new LinkFileListener("src/data/link.csv", config.getIdentityProperties());
         proc.addMatchListener(linkfile);
-        proc.link(config.getDataSources(1), config.getDataSources(2), false, DEFAULT_BATCH_SIZE);
+        proc.link();
         proc.close();
     }
 
