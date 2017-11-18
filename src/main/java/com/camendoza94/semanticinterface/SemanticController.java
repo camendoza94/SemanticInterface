@@ -26,16 +26,16 @@ class SemanticController {
         HashMap<String, ArrayList<String>> matches = getMatchingFromCSV();
         System.out.println("Device ID: " + deviceID);
         ArrayList<String[]> services = new ArrayList<>();
-        for(String match: matches.get(deviceID)) {
+        if (matches.get(deviceID) == null)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Service not found");
+        for (String match : matches.get(deviceID)) {
             services.add(getServicePostAPI(match));
         }
-        System.out.println("Service: " + services);
-        //TODO Manage exceptions
-        if (services.get(0)[0] == null || services.get(0)[0] == null) {
+        if (services.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Service not found");
         }
         StringBuilder URL = new StringBuilder();
-        for(String[] service: services) {
+        for (String[] service : services) {
             URL.append(service[0]).append("/").append(service[1]).append("\n");
         }
         return ResponseEntity.status(HttpStatus.OK).body(URL.toString());
@@ -78,7 +78,7 @@ class SemanticController {
                 System.out.println(line);
                 String deviceId = line.split(",")[1].trim();
                 String methodClass = line.split(",")[2].trim();
-                matches.computeIfAbsent(deviceId, k -> new ArrayList<>()); //no ArrayList assigned, create new ArrayList
+                matches.computeIfAbsent(deviceId, k -> new ArrayList<>());
                 matches.get(deviceId).add(methodClass);
                 line = br.readLine();
             }
