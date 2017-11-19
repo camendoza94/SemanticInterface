@@ -1,15 +1,15 @@
 package com.camendoza94.semanticinterface;
 
+import com.camendoza94.exceptions.DeviceNotFoundInOntologyException;
+import com.camendoza94.exceptions.ServiceNotFoundInOntologyException;
 import com.camendoza94.matching.DukeMatching;
 import org.apache.jena.query.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.xml.sax.SAXException;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -22,23 +22,26 @@ import java.util.HashMap;
 class SemanticController {
 
     @RequestMapping(method = RequestMethod.POST)
-    ResponseEntity<String> requestService(@RequestBody String deviceID) {
+    ResponseEntity<String> requestService(@RequestBody String deviceID) throws DeviceNotFoundInOntologyException, ServiceNotFoundInOntologyException {
         HashMap<String, ArrayList<String>> matches = getMatchingFromCSV();
         System.out.println("Device ID: " + deviceID);
         ArrayList<String[]> services = new ArrayList<>();
-        if (matches.get(deviceID) == null)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Service not found");
+        //Device is not in ontology
+        if (matches.get(deviceID) == null) {
+            throw new DeviceNotFoundInOntologyException();
+        }
         for (String match : matches.get(deviceID)) {
             services.add(getServicePostAPI(match));
         }
+        //Matched service is not in ontology
         if (services.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Service not found");
+            throw new ServiceNotFoundInOntologyException();
         }
         StringBuilder URL = new StringBuilder();
         for (String[] service : services) {
             URL.append(service[0]).append("/").append(service[1]).append("\n");
         }
-        return ResponseEntity.status(HttpStatus.OK).body(URL.toString());
+        return ResponseEntity.ok().body(URL.toString());
     }
 
     private static String[] getServicePostAPI(String matched) {
@@ -67,6 +70,7 @@ class SemanticController {
             info[2] = next.get("bodyLabels").toString();
             info[3] = next.get("dataTypes").toString();
         }
+        //TODO Check if info is empty and throw exception
         return info;
     }
 
@@ -75,24 +79,39 @@ class SemanticController {
         try (BufferedReader br = new BufferedReader(new FileReader("src/data/link.csv"))) {
             String line = br.readLine();
             while (line != null) {
-                System.out.println(line);
+                String[] parts = line.split(",");
+                if (parts.length != 4)
+                    throw new FileNotFoundException(); //TODO Change exception
                 String deviceId = line.split(",")[1].trim();
-                String methodClass = line.split(",")[2].trim();
+                String methodInstance = line.split(",")[2].trim();
                 matches.computeIfAbsent(deviceId, k -> new ArrayList<>());
-                matches.get(deviceId).add(methodClass);
+                matches.get(deviceId).add(methodInstance);
                 line = br.readLine();
             }
         } catch (FileNotFoundException e) {
             try {
                 DukeMatching.matching();
+                getMatchingFromCSV();
             } catch (IOException | SAXException e1) {
+                //TODO map exceptions
                 System.out.println("Error while matching.");
                 e1.printStackTrace();
             }
         } catch (IOException e) {
+            //TODO map exception
             System.out.println("Couldn't find any matches.");
             e.printStackTrace();
         }
         return matches;
+    }
+
+    @ExceptionHandler
+    void handleDeviceNotFoundException(DeviceNotFoundInOntologyException e, HttpServletResponse response) throws IOException {
+        response.sendError(HttpStatus.PRECONDITION_FAILED.value());
+    }
+
+    @ExceptionHandler
+    void handleServiceNotFoundException(ServiceNotFoundInOntologyException e, HttpServletResponse response) throws IOException {
+        response.sendError(HttpStatus.SERVICE_UNAVAILABLE.value());
     }
 }
