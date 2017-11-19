@@ -80,7 +80,7 @@ class SemanticController {
             while (line != null) {
                 String[] parts = line.split(",");
                 if (parts.length != 4)
-                    throw new FileNotFoundException(); //TODO Change exception
+                    throw new NoMatchesFoundException();
                 String deviceId = line.split(",")[1].trim();
                 String methodInstance = line.split(",")[2].trim();
                 matches.computeIfAbsent(deviceId, k -> new ArrayList<>());
