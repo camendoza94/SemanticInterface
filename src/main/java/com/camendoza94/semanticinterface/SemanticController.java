@@ -1,6 +1,6 @@
 package com.camendoza94.semanticinterface;
 
-import com.camendoza94.exceptions.DeviceNotFoundInOntologyException;
+import com.camendoza94.exceptions.NoMatchesFoundException;
 import com.camendoza94.exceptions.ServiceNotFoundInOntologyException;
 import com.camendoza94.matching.DukeMatching;
 import org.apache.jena.query.*;
@@ -22,13 +22,13 @@ import java.util.HashMap;
 class SemanticController {
 
     @RequestMapping(method = RequestMethod.POST)
-    ResponseEntity<String> requestService(@RequestBody String deviceID) throws DeviceNotFoundInOntologyException, ServiceNotFoundInOntologyException {
+    ResponseEntity<String> requestService(@RequestBody String deviceID) throws NoMatchesFoundException, ServiceNotFoundInOntologyException {
         HashMap<String, ArrayList<String>> matches = getMatchingFromCSV();
         System.out.println("Device ID: " + deviceID);
         ArrayList<String[]> services = new ArrayList<>();
         //Device is not in ontology
         if (matches.get(deviceID) == null) {
-            throw new DeviceNotFoundInOntologyException();
+            throw new NoMatchesFoundException();
         }
         for (String match : matches.get(deviceID)) {
             services.add(getServicePostAPI(match));
@@ -70,11 +70,10 @@ class SemanticController {
             info[2] = next.get("bodyLabels").toString();
             info[3] = next.get("dataTypes").toString();
         }
-        //TODO Check if info is empty and throw exception
         return info;
     }
 
-    private static HashMap<String, ArrayList<String>> getMatchingFromCSV() {
+    private static HashMap<String, ArrayList<String>> getMatchingFromCSV() throws NoMatchesFoundException {
         HashMap<String, ArrayList<String>> matches = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader("src/data/link.csv"))) {
             String line = br.readLine();
@@ -93,20 +92,16 @@ class SemanticController {
                 DukeMatching.matching();
                 getMatchingFromCSV();
             } catch (IOException | SAXException e1) {
-                //TODO map exceptions
-                System.out.println("Error while matching.");
-                e1.printStackTrace();
+                throw new NoMatchesFoundException();
             }
         } catch (IOException e) {
-            //TODO map exception
-            System.out.println("Couldn't find any matches.");
-            e.printStackTrace();
+            throw new NoMatchesFoundException();
         }
         return matches;
     }
 
     @ExceptionHandler
-    void handleDeviceNotFoundException(DeviceNotFoundInOntologyException e, HttpServletResponse response) throws IOException {
+    void handleDeviceNotFoundException(NoMatchesFoundException e, HttpServletResponse response) throws IOException {
         response.sendError(HttpStatus.PRECONDITION_FAILED.value());
     }
 
