@@ -22,15 +22,15 @@ import java.util.HashMap;
 class SemanticController {
 
     @RequestMapping(method = RequestMethod.POST)
-    ResponseEntity<String> requestService(@RequestBody String deviceID) throws NoMatchesFoundException, ServiceNotFoundInOntologyException {
+    ResponseEntity<String> requestService(@RequestBody String deviceReference) throws NoMatchesFoundException, ServiceNotFoundInOntologyException {
         HashMap<String, ArrayList<String>> matches = getMatchingFromCSV();
-        System.out.println("Device ID: " + deviceID);
+        System.out.println("Device Reference: " + deviceReference);
         ArrayList<String[]> services = new ArrayList<>();
         //Device is not in ontology
-        if (matches.get(deviceID) == null) {
+        if (matches.get(deviceReference) == null) {
             throw new NoMatchesFoundException();
         }
-        for (String match : matches.get(deviceID)) {
+        for (String match : matches.get(deviceReference)) {
             services.add(getServicePostAPI(match));
         }
         //Matched service is not in ontology
