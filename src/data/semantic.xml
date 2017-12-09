@@ -74,9 +74,9 @@ GROUP BY ?method ?propertyName'/>
             <param name="query" value='
 PREFIX : &lt;http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#>
 PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#>
-SELECT ?deviceID ?propertyName (COUNT(?bodyField) as ?bodyFields) (group_concat(?bodyLabel) as ?bodyLabels) (group_concat(?dataTypeLabel) as ?dataTypes)
+SELECT ?deviceReference ?propertyName (COUNT(?bodyField) as ?bodyFields) (group_concat(?bodyLabel) as ?bodyLabels) (group_concat(?dataTypeLabel) as ?dataTypes)
 WHERE {
- ?device :hasMeasurementCapability ?measurementCapability; :hasDeviceId ?deviceID .
+ ?device :hasMeasurementCapability ?measurementCapability; :hasDeviceReference ?deviceReference .
  ?measurementCapability a :MeasurementCapability .
  ?measurementCapability :forProperty ?property; :hasBodyField ?bodyField .
  ?property rdfs:label ?propertyName .
@@ -85,7 +85,7 @@ WHERE {
 }
 GROUP BY ?deviceID ?propertyName'/>
 
-            <column name="deviceID"
+            <column name="deviceReference"
                     property="ID"/>
             <column name="propertyName"
                     cleaner="no.priv.garshol.duke.cleaners.LowerCaseNormalizeCleaner"
