@@ -83,7 +83,7 @@ WHERE {
  ?bodyField rdfs:label ?bodyLabel; :hasDataType ?dataType .
  ?dataType rdfs:label ?dataTypeLabel .
 }
-GROUP BY ?deviceID ?propertyName'/>
+GROUP BY ?deviceReference ?propertyName'/>
 
             <column name="deviceReference"
                     property="ID"/>

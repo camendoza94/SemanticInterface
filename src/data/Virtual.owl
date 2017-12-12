@@ -219,7 +219,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Luminosity">
         <rdf:type rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/services#Property"/>
-        <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Luminosity</rdfs:label>
+        <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Temperatura</rdfs:label>
     </owl:NamedIndividual>
     
 

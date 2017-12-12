@@ -125,7 +125,7 @@
 
     <!-- http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#hasDeviceId -->
 
-    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#hasDeviceId">
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#hasDeviceReference">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
         <rdfs:domain rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#Device"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
@@ -408,7 +408,7 @@
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#TMP36">
         <rdf:type rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#Sensor"/>
         <iotdevices:hasMeasurementCapability rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#MeasurementCapability1"/>
-        <iotdevices:hasDeviceId rdf:datatype="http://www.w3.org/2001/XMLSchema#string">TMP36</iotdevices:hasDeviceId>
+        <iotdevices:hasDeviceReference rdf:datatype="http://www.w3.org/2001/XMLSchema#string">TMP36</iotdevices:hasDeviceReference>
     </owl:NamedIndividual>
     
 
@@ -418,7 +418,7 @@
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#TSL2561">
         <rdf:type rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#Sensor"/>
         <iotdevices:hasMeasurementCapability rdf:resource="http://www.semanticweb.org/ca.mendoza968/ontologies/iotdevices#MeasurementCapability2"/>
-        <iotdevices:hasDeviceId rdf:datatype="http://www.w3.org/2001/XMLSchema#string">TSL2561</iotdevices:hasDeviceId>
+        <iotdevices:hasDeviceReference rdf:datatype="http://www.w3.org/2001/XMLSchema#string">TSL2561</iotdevices:hasDeviceReference>
     </owl:NamedIndividual>
     
 
