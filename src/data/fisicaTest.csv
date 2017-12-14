@@ -1,5 +1,20 @@
 deviceID,propertyName,bodyFields,bodyLabels,dataTypes
-A,temperatura,2,value time,number string
-B,temperature,1,value,number
-C,luminos,2,value time,number string
+A,temperatura,3,value time alert,number string string
+B,temperature,3,value time alert,number string string
+C,luminos,3,value time alert,number string string
 D,temperatura,3,value time alert,number string string
+E,tempearure,3,value time alert,number string string
+F,tempe,3,value time alert,number string string
+F1,temper,3,value time alert,number string string
+G,temp erature,3,value time alert,number string string
+H,temp,3,value time alert,number string string
+I,conductividad,3,value time alert,number string string
+J,contuctivrty,3,value time alert,number string string
+K,conduct,3,value time alert,number string string
+L,cond ucitivty,3,value time alert,number string string
+M,cond,3,value time alert,number string string
+N,ph level,3,value time alert,number string string
+O,hp lebel,3,value time alert,number string string
+P,ph lev,3,value time alert,number string string
+Q,ph_level,3,value time alert,number string string
+R,ph,3,value time alert,number string string

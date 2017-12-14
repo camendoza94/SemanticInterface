@@ -1,4 +1,4 @@
 method,propertyName,bodyFields,bodyLabels,dataTypes
-1,temperatura,2,value time,number string
-2,temperature,1,value,number
-3,tempera,3,time alert value,string string number
+1,temperature,3,value time alert,number string string
+5,conductivity,3,value time alert,number string string
+7,ph level,3,value time alert,number string string

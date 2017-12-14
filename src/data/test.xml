@@ -1,6 +1,6 @@
 <duke>
     <schema>
-        <threshold>0.75</threshold>
+        <threshold>0.7</threshold>
         <property type="id">
             <name>ID</name>
         </property>
